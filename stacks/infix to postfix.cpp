@@ -21,7 +21,7 @@ char pop(){
 	}
 }
 int isoperand(char x){
-	if(x=='*' || x=='+' || x=='-' || x=='/'){
+	if(x=='*' || x=='+' || x=='-' || x=='/'|| x=='(' || x==')'){
 		return 0;
 	}
 	else{
@@ -32,11 +32,14 @@ int pre(char x){
 	if(x=='#'){
 		return 1;
 	}
-	else if(x=='+' || x=='-'){
+	else if(x=='('){
 		return 2;
 	}
-	else if(x=='*' || x=='/'){
+	else if(x=='+' || x=='-'){
 		return 3;
+	}
+	else if(x=='*' || x=='/'){
+		return 4;
 	}
 }
 int isdigit(char x){
@@ -51,7 +54,7 @@ int isdigit(char x){
 evaluate(char postfix[]){
 	char ch;
 	int i = 0,x1,x2;
-	while( (ch = postfix[i++]) != '\0') {
+	while((ch = postfix[i++]) != '\0') {
 		if(isdigit(ch))
 		{
 			push(ch-'0'); // Push the operand
@@ -87,16 +90,27 @@ convert(char infix[])
 			postfix[j++]=infix[i++];
 		}
 		else{
-			if(pre(infix[i])>pre(stack[top])){
+			if(infix[i]=='('){
 				push(infix[i++]);
 			}
+			else if(infix[i]==')'){
+				while(stack[top]!='('){
+					postfix[j++]=pop();
+				}
+				pop();
+				i++;
+			}
 			else{
-				while(pre(infix[i])<=pre(stack[top])){
-						postfix[j++]=pop();
+				if(pre(infix[i])>pre(stack[top]))
+					push(infix[i++]);
+				else{
+					while(pre(infix[i])<=pre(stack[top])){
+							postfix[j++]=pop();
 					}
 					push(infix[i++]);
 				}
 			}
+		}
 	}
 	while(stack[top]!='#'){
 		postfix[j++]=pop();
